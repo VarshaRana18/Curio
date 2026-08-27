@@ -15,10 +15,12 @@ class SearchService:
             downloaded = trafilatura.fetch_url(result.get("url"))
             content = trafilatura.extract(downloaded)
             
+            safe_content = content or result.get("content") or ""
+            
             results.append({
                 "title" : result.get("title"),
                 "url" : result.get("url"),
-                "content" : content
+                "content" : safe_content
             })
             
         return results
