@@ -3,8 +3,13 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 
 class SortSourceService:
-    def __init__(self):
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+    _embedding_model = None
+    
+    @property
+    def embedding_model(self):
+        if SortSourceService._embedding_model is None:
+            SortSourceService._embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        return SortSourceService._embedding_model
         
     def sort_sources(self, query : str, search_results : List[dict]):
         relevant_docs = []
@@ -14,7 +19,7 @@ class SortSourceService:
             res_embedding = self.embedding_model.encode(result.get("content"))
             similarity = np.dot(query_embedding,res_embedding) / (np.linalg.norm(query_embedding) * (np.linalg.norm(res_embedding)))
         
-            result["relevance_score"] = similarity
+            result["relevance_score"] = float(similarity)
             
             if similarity > 0.5:
                 relevant_docs.append(result)
