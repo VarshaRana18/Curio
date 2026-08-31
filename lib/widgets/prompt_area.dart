@@ -1,7 +1,21 @@
+import 'package:curio/services/chat_web_service.dart';
 import 'package:flutter/material.dart';
 
-class PromptArea extends StatelessWidget {
+class PromptArea extends StatefulWidget {
   const PromptArea({super.key});
+
+  @override
+  State<PromptArea> createState() => _PromptAreaState();
+}
+
+class _PromptAreaState extends State<PromptArea> {
+  final queryController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    queryController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +42,11 @@ class PromptArea extends StatelessWidget {
             color: const Color.fromARGB(255, 150, 150, 150),
             onPressed: () {},
           ),
-          const Expanded(
+          Expanded(
             child: TextField(
-              cursorColor: Color(0xFF8B5CF6),
-              decoration: InputDecoration(
+              controller: queryController,
+              cursorColor: const Color(0xFF8B5CF6),
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: "Ask anything..",
                 hintStyle: TextStyle(color: Colors.black38),
@@ -48,7 +63,9 @@ class PromptArea extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.send_rounded, size: 20),
                 color: Colors.white,
-                onPressed: () {},
+                onPressed: () {
+                  ChatWebService().chat(queryController.text.trim());
+                },
               ),
             ),
           ),

@@ -1,15 +1,23 @@
 import 'package:curio/widgets/prompt_area.dart';
+import 'package:curio/services/chat_web_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Required for ImageFilter
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State createState() => _HomePage();
 }
 
 class _HomePage extends State<HomePage> {
+  String fullResponse = "";
+  @override
+  void initState() {
+    super.initState();
+    ChatWebService().connect();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get screen dimensions for responsive positioning
@@ -114,6 +122,45 @@ class _HomePage extends State<HomePage> {
                         ),
                       ),
                     ],
+                  ),
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: StreamBuilder(
+                        stream: ChatWebService().contentStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.waiting &&
+                              !snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          if (snapshot.hasError) {
+                            return Text("Error: ${snapshot.error}");
+                          }
+
+                          if (snapshot.hasData) {
+                            // Extract data safely based on server JSON payload
+                            final chunk =
+                                snapshot.data?["data"] ??
+                                snapshot.data?["content"] ??
+                                "";
+                            fullResponse += chunk;
+                          }
+
+                          return Text(
+                            fullResponse,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
 
                   PromptArea(),
