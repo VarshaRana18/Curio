@@ -66,6 +66,12 @@ class _PromptAreaState extends State<PromptArea> {
                 color: Colors.white,
                 onPressed: () {
                   ChatWebService().chat(queryController.text.trim());
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ChatPage(query: queryController.text.trim()),
+                    ),
+                  );
                 },
               ),
             ),

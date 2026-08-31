@@ -1,4 +1,4 @@
-import 'package:curio/widgets/prompt_area.dart';
+import 'package:curio/widgets/prompt_section.dart';
 import 'package:curio/services/chat_web_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Required for ImageFilter
