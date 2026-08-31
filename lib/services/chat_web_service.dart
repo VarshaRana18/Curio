@@ -14,8 +14,9 @@ class ChatWebService {
   // private named constructor that prevents direct external instantiation
   ChatWebService._internal();
 
-  final _searchResultController = StreamController<Map<String, dynamic>>();
-  final _contentController = StreamController<Map<String, dynamic>>();
+  final _searchResultController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final _contentController = StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get searchResultStream =>
       _searchResultController.stream;
