@@ -1,3 +1,4 @@
+import 'package:curio/pages/chat_page.dart';
 import 'package:curio/services/chat_web_service.dart';
 import 'package:flutter/material.dart';
 
