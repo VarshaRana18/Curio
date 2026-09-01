@@ -66,8 +66,20 @@ Start numbering with offset:
   String _formatCitations(String rawText) {
     final citationRegex = RegExp(r'\[(\d+)\]');
     return rawText.replaceAllMapped(citationRegex, (match) {
-      final index = match.group(1);
-      return '[[^$index]](citation:$index)';
+      final innerContent = match.group(1) ?? '';
+      final numberRegex = RegExp(r'\d+');
+      final matches = numberRegex.allMatches(innerContent);
+
+      if (matches.isEmpty) {
+        return match.group(0) ?? ''; // Fallback if no numbers found
+      }
+
+      return matches
+          .map((m) {
+            final index = m.group(0);
+            return '[[^$index]](citation:$index)';
+          })
+          .join(' ');
     });
   }
 

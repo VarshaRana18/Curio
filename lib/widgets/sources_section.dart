@@ -36,17 +36,14 @@ class _SourceSectionState extends State<SourceSection> {
   Future<void> _openSourceUrl(String? url) async {
     if (isLoading || url == null || url.isEmpty) return;
 
-    print("in the function");
     final uri = Uri.parse(url);
     try {
-      print("trying to launch $url in externalApplication");
       final launched = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
 
       if (!launched) {
-        print("trying to launch $url in platformDefault");
         await launchUrl(uri, mode: LaunchMode.platformDefault);
       }
     } catch (e) {
@@ -70,6 +67,7 @@ class _SourceSectionState extends State<SourceSection> {
               width: 150,
               margin: const EdgeInsets.only(right: 10),
               child: Material(
+                borderRadius: BorderRadius.circular(16),
                 color: Colors.white,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
