@@ -98,7 +98,7 @@ Start numbering with offset:
           await launchUrl(uri, mode: LaunchMode.platformDefault);
         }
       } catch (e) {
-        print("Could not launch $targetUrl: $e");
+        debugPrint("Could not launch $targetUrl: $e");
       }
     }
   }
@@ -134,9 +134,6 @@ Start numbering with offset:
                 ? "Synthesizing research..."
                 : formattedMarkdown,
             onTapLink: (text, href, title) {
-              print("text $text");
-              print("title $title");
-              print("href $href");
               _handleLinkTap(href!);
             },
             shrinkWrap: true,
