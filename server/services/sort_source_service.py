@@ -21,7 +21,7 @@ class SortSourceService:
         
             result["relevance_score"] = float(similarity)
             
-            if similarity > 0.5:
+            if similarity > 0.3:
                 relevant_docs.append(result)
                 
         return sorted(relevant_docs,key=lambda res: res["relevance_score"],reverse=True)

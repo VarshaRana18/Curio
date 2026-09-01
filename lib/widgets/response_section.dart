@@ -2,14 +2,17 @@ import 'package:curio/services/chat_web_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResponseSection extends StatefulWidget {
+  const ResponseSection({super.key});
   @override
   State<ResponseSection> createState() => _ResponseSectionState();
 }
 
 class _ResponseSectionState extends State<ResponseSection> {
   bool isLoading = true;
+  List<dynamic> sources = [];
   String response = """
   ## Lists
 
@@ -48,14 +51,62 @@ Start numbering with offset:
         response = "";
       }
       setState(() {
-        response += data['data'];
+        response += data['data'] ?? "";
         isLoading = false;
+      });
+    });
+
+    ChatWebService().searchResultStream.listen((data) {
+      setState(() {
+        sources = data['data'] ?? [];
       });
     });
   }
 
+  String _formatCitations(String rawText) {
+    final citationRegex = RegExp(r'\[(\d+)\]');
+    return rawText.replaceAllMapped(citationRegex, (match) {
+      final index = match.group(1);
+      return '[[^$index]](citation:$index)';
+    });
+  }
+
+  Future<void> _handleLinkTap(String href) async {
+    // if (href == null) return;
+    String? targetUrl;
+
+    if (href.startsWith('citation:')) {
+      final indStr = href.replaceFirst('citation:', '');
+      final index = int.tryParse(indStr);
+
+      if (index != null && index > 0 && index <= sources.length) {
+        targetUrl = sources[index - 1]['url'];
+      }
+    } else {
+      targetUrl = href;
+    }
+
+    if (targetUrl != null && targetUrl.isNotEmpty) {
+      final uri = Uri.parse(targetUrl);
+      try {
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+
+        if (!launched) {
+          await launchUrl(uri, mode: LaunchMode.platformDefault);
+        }
+      } catch (e) {
+        print("Could not launch $targetUrl: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final formattedMarkdown = _formatCitations(response);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,7 +130,15 @@ Start numbering with offset:
         Skeletonizer(
           enabled: isLoading,
           child: MarkdownBody(
-            data: response.isEmpty ? "Thinking..." : response,
+            data: response.isEmpty
+                ? "Synthesizing research..."
+                : formattedMarkdown,
+            onTapLink: (text, href, title) {
+              print("text $text");
+              print("title $title");
+              print("href $href");
+              _handleLinkTap(href!);
+            },
             shrinkWrap: true,
             styleSheet: MarkdownStyleSheet(
               p: const TextStyle(
