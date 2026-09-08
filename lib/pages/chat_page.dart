@@ -97,7 +97,7 @@ class ChatPage extends StatelessWidget {
                             ],
                           ),
 
-                          child: ResponseSection(),
+                          child: ResponseSection(query: query),
                         ),
                       ],
                     ),

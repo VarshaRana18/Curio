@@ -1,11 +1,14 @@
 import 'package:curio/services/chat_web_service.dart';
+import 'package:curio/services/pdf_export_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ResponseSection extends StatefulWidget {
-  const ResponseSection({super.key});
+  final String query;
+  ResponseSection({super.key, this.query = ""});
   @override
   State<ResponseSection> createState() => _ResponseSectionState();
 }
@@ -115,6 +118,35 @@ Start numbering with offset:
     }
   }
 
+  void _copyToClipboard() {
+    if (response.isEmpty) return;
+    Clipboard.setData(ClipboardData(text: response));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text("Markdown response copied to clipboard!"),
+          ],
+        ),
+        backgroundColor: const Color(0xFF6366F1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _exportPdf() {
+    if (response.isEmpty) return;
+    PdfExportService.exportResearchReport(
+      query: widget.query,
+      responseText: response,
+      sources: sources,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final formattedMarkdown = _formatCitations(response);
@@ -122,21 +154,75 @@ Start numbering with offset:
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.auto_awesome, size: 20, color: Color(0xFF8B5CF6)),
-            SizedBox(width: 8),
-            Text(
-              "Answer",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Color(0xFF7C3AED),
-              ),
+            Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome,
+                  size: 20,
+                  color: Color(0xFF8B5CF6),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  "Answer",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Color(0xFF7C3AED),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.copy_rounded,
+                    size: 18,
+                    color: Colors.black54,
+                  ),
+                  tooltip: "Copy Markdown",
+                  onPressed: _copyToClipboard,
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.picture_as_pdf_rounded,
+                    size: 18,
+                    color: Color(0xFF7C3AED),
+                  ),
+                  tooltip: "Export PDF Report",
+                  onPressed: _exportPdf,
+                ),
+              ],
             ),
           ],
         ),
 
+        // if (response.isNotEmpty)
+        //   Row(
+        //     children: [
+        //       IconButton(
+        //         icon: const Icon(
+        //           Icons.copy_rounded,
+        //           size: 18,
+        //           color: Colors.black54,
+        //         ),
+        //         tooltip: "Copy Markdown",
+        //         onPressed: _copyToClipboard,
+        //       ),
+        //       IconButton(
+        //         icon: const Icon(
+        //           Icons.picture_as_pdf_rounded,
+        //           size: 18,
+        //           color: Color(0xFF7C3AED),
+        //         ),
+        //         tooltip: "Export PDF Report",
+        //         onPressed: _exportPdf,
+        //       ),
+        //     ],
+        //   ),
         const Divider(height: 24, color: Color(0xFFF3E8FF)),
 
         Skeletonizer(
