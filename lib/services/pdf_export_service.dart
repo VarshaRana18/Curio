@@ -123,26 +123,40 @@ String stripMarkdown(String markdown) {
 
   // 1. Remove code blocks (```code```) and inline code (`code`)
   text = text.replaceAll(RegExp(r'```[\s\S]*?```'), '');
-  text = text.replaceAll(RegExp(r'`([^`]+)`'), r'$1');
+  text = text.replaceAllMapped(RegExp(r'`([^`]+)`'), (m) => m[1] ?? '');
 
-  // 2. Remove markdown headers (# Title -> Title)
+  // 2. Remove display math blocks ($$...$$)
+  text = text.replaceAll(RegExp(r'\$\$[\s\S]*?\$\$'), '');
+
+  // 3. Remove inline LaTeX/math tokens ($int, $theta)
+  text = text.replaceAll(RegExp(r'\$(?!\d)[\s\S]*?\$'), '');
+  text = text.replaceAll(RegExp(r'\$[a-zA-Z_]\w*'), '');
+
+  // 4. Remove markdown headers (# Title -> Title)
   text = text.replaceAll(RegExp(r'^\s*#{1,6}\s+', multiLine: true), '');
 
-  // 3. Remove bold and italic markers (***text***, **text**, *text*, __text__, _text_)
-  text = text.replaceAll(RegExp(r'(\*\*|__)(.*?)\1'), r'$2');
-  text = text.replaceAll(RegExp(r'(\*|_)(.*?)\1'), r'$2');
+  // 5. Remove bold & italic syntax cleanly without printing "$2"
+  text = text.replaceAllMapped(RegExp(r'\*\*\*(.*?)\*\*\*'), (m) => m[1] ?? '');
+  text = text.replaceAllMapped(RegExp(r'\*\*(.*?)\*\*'), (m) => m[1] ?? '');
+  text = text.replaceAllMapped(RegExp(r'\*(.*?)\*'), (m) => m[1] ?? '');
+  text = text.replaceAllMapped(RegExp(r'___(.*?)___'), (m) => m[1] ?? '');
+  text = text.replaceAllMapped(RegExp(r'__(.*?)__'), (m) => m[1] ?? '');
+  text = text.replaceAllMapped(RegExp(r'_(.*?)_'), (m) => m[1] ?? '');
 
-  // 4. Clean up Markdown links: [Title](url) -> Title
-  text = text.replaceAll(RegExp(r'\[([^\]]+)\]\([^\)]+\)'), r'$1');
+  // 6. Clean Markdown links: [Title](url) -> Title
+  text = text.replaceAllMapped(
+    RegExp(r'\[([^\]]+)\]\([^\)]+\)'),
+    (m) => m[1] ?? '',
+  );
 
-  // 5. Clean up blockquotes and horizontal rules
+  // 7. Remove blockquotes and horizontal dividers
   text = text.replaceAll(RegExp(r'^\s*>\s+', multiLine: true), '');
   text = text.replaceAll(RegExp(r'^\s*[-*_]{3,}\s*$', multiLine: true), '');
 
-  // 6. Normalize list bullets to a clean, readable symbol (•)
-  text = text.replaceAll(RegExp(r'^\s*[\*\-\+]\s+', multiLine: true), '• ');
+  // 8. Use standard ASCII hyphen instead of '•' to prevent font rendering boxes
+  text = text.replaceAll(RegExp(r'^\s*[\*\-\+]\s+', multiLine: true), '- ');
 
-  // 7. Collapse excessive blank lines
+  // 9. Collapse multiple blank lines
   text = text.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
   return text.trim();
