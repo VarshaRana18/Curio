@@ -200,29 +200,6 @@ Start numbering with offset:
           ],
         ),
 
-        // if (response.isNotEmpty)
-        //   Row(
-        //     children: [
-        //       IconButton(
-        //         icon: const Icon(
-        //           Icons.copy_rounded,
-        //           size: 18,
-        //           color: Colors.black54,
-        //         ),
-        //         tooltip: "Copy Markdown",
-        //         onPressed: _copyToClipboard,
-        //       ),
-        //       IconButton(
-        //         icon: const Icon(
-        //           Icons.picture_as_pdf_rounded,
-        //           size: 18,
-        //           color: Color(0xFF7C3AED),
-        //         ),
-        //         tooltip: "Export PDF Report",
-        //         onPressed: _exportPdf,
-        //       ),
-        //     ],
-        //   ),
         const Divider(height: 24, color: Color(0xFFF3E8FF)),
 
         Skeletonizer(
