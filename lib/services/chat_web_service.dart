@@ -23,7 +23,7 @@ class ChatWebService {
   Stream<Map<String, dynamic>> get contentStream => _contentController.stream;
 
   void connect() {
-    _socket = WebSocket(Uri.parse("ws://10.0.2.2:8000/ws/chat"));
+    _socket = WebSocket(Uri.parse("ws://192.168.1.74:8000/ws/chat"));
 
     _socket!.messages.listen((message) {
       final data = json.decode(message);

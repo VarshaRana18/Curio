@@ -21,7 +21,7 @@ class _PromptAreaState extends State<PromptArea> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      constraints: const BoxConstraints(minHeight: 56),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -37,6 +37,7 @@ class _PromptAreaState extends State<PromptArea> {
 
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -47,6 +48,9 @@ class _PromptAreaState extends State<PromptArea> {
             child: TextField(
               controller: queryController,
               cursorColor: const Color(0xFF8B5CF6),
+              maxLines: 5,
+              minLines: 1,
+              keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: "Ask anything..",
